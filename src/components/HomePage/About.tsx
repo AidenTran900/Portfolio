@@ -4,10 +4,9 @@ import {
 } from 'react-icons/fa';
 import { SiLua, SiRobloxstudio, SiElectron, SiCplusplus, SiNextdotjs, SiUnity, SiTypescript, SiPostgresql, SiFigma } from "react-icons/si";
 import { motion, useInView } from 'framer-motion';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { useGLTF, Environment } from '@react-three/drei';
 import * as THREE from 'three';
-import ThreeMeshUI from 'three-mesh-ui';
 import '@styles/Components/HomePage/About.css';
 
 interface CollapsibleSectionProps {
@@ -78,15 +77,19 @@ interface LaptopModelProps {
     isOpen: boolean;
 }
 
+// Reusable Three.js objects to avoid GC pressure in useFrame
+const tempVec3 = new THREE.Vector3();
+const tempVec3_2 = new THREE.Vector3();
+const tempQuat = new THREE.Quaternion();
+const screenColor = new THREE.Color('#ffffff');
+
 const LaptopModel: React.FC<LaptopModelProps> = ({ scale, position, rotation, isOpen }) => {
     const { scene, cameras } = useGLTF('/models/Laptop/thinkpad.glb');
     const topLidRef = useRef<THREE.Object3D | null>(null);
     const screenRef = useRef<THREE.Object3D | null>(null);
     const screenLightRef = useRef<THREE.PointLight>(null);
-    const screenUIRef = useRef<any>(null);
     const [targetRotation, setTargetRotation] = useState(Math.PI);
 
-    const screenColor = new THREE.Color('#ffffff');
     const screenEmissiveIntensity = 1;
     const screenRotationOffset = 1.05;
 
@@ -143,54 +146,52 @@ const LaptopModel: React.FC<LaptopModelProps> = ({ scale, position, rotation, is
 
     useEffect(() => {
         setTargetRotation(isOpen ? Math.PI*0.12 : Math.PI*0.67);
+        // Trigger render loop when open state changes
+        invalidate();
     }, [isOpen]);
 
-    useFrame(() => {
-        ThreeMeshUI.update();
+    useFrame((_, delta) => {
+        // Clamp delta to prevent huge jumps after tab switch
+        const clampedDelta = Math.min(delta, 0.1);
+        const lerpFactor = 1 - Math.pow(0.001, clampedDelta);
+
+        let needsUpdate = false;
 
         if (topLidRef.current) {
             const currentRotation = topLidRef.current.rotation.x;
             const diff = targetRotation - currentRotation;
-            topLidRef.current.rotation.x += diff * 0.05;
+            // Stop animating when close enough
+            if (Math.abs(diff) > 0.001) {
+                topLidRef.current.rotation.x += diff * lerpFactor;
+                needsUpdate = true;
+            }
         }
 
         if (screenRef.current) {
             const targetScreenRotation = targetRotation + screenRotationOffset;
             const currentRotation = screenRef.current.rotation.x;
             const diff = targetScreenRotation - currentRotation;
-            screenRef.current.rotation.x += diff * 0.05;
-
-            if (screenUIRef.current && isOpen) {
-                const screenWorldPos = new THREE.Vector3();
-                const screenWorldQuat = new THREE.Quaternion();
-                screenRef.current.getWorldPosition(screenWorldPos);
-                screenRef.current.getWorldQuaternion(screenWorldQuat);
-
-                const faceQuat = new THREE.Quaternion();
-                const euler = new THREE.Euler(-Math.PI / 2, 0, 0);
-                faceQuat.setFromEuler(euler);
-
-                const finalQuat = screenWorldQuat.clone().multiply(faceQuat);
-
-                screenUIRef.current.position.copy(screenWorldPos);
-                screenUIRef.current.quaternion.copy(finalQuat);
-
-                const offset = new THREE.Vector3(0, 0.01, 0);
-                offset.applyQuaternion(screenWorldQuat);
-                screenUIRef.current.position.add(offset);
+            if (Math.abs(diff) > 0.001) {
+                screenRef.current.rotation.x += diff * lerpFactor;
+                needsUpdate = true;
             }
 
-            if (screenLightRef.current && isOpen) {
-                const screenWorldPos = new THREE.Vector3();
-                screenRef.current.getWorldPosition(screenWorldPos);
+            if (screenLightRef.current) {
+                screenRef.current.getWorldPosition(tempVec3);
+                screenRef.current.getWorldQuaternion(tempQuat);
 
-                const screenNormal = new THREE.Vector3(0, 0, 1);
-                screenNormal.applyQuaternion(screenRef.current.getWorldQuaternion(new THREE.Quaternion()));
-                screenNormal.multiplyScalar(0.3);
+                tempVec3_2.set(0, 0, 1);
+                tempVec3_2.applyQuaternion(tempQuat);
+                tempVec3_2.multiplyScalar(0.3);
 
-                screenLightRef.current.position.copy(screenWorldPos.add(screenNormal));
-                screenLightRef.current.intensity = 10;
+                screenLightRef.current.position.copy(tempVec3.add(tempVec3_2));
+                screenLightRef.current.intensity = isOpen ? 10 : 0;
             }
+        }
+
+        // Request next frame only if still animating
+        if (needsUpdate) {
+            invalidate();
         }
     });
 
@@ -201,9 +202,9 @@ const LaptopModel: React.FC<LaptopModelProps> = ({ scale, position, rotation, is
             <pointLight
                 ref={screenLightRef}
                 color={screenColor}
-                intensity={100}
-                distance={200}
-                decay={0}
+                intensity={10}
+                distance={5}
+                decay={2}
             />
 
             <primitive
@@ -256,7 +257,7 @@ const About: React.FC = () => {
                         <p className="aboutSubText">
                             I love building things that challenge me to<br />
                             <span className="highlight">think differently</span> and <span className="highlight">create something</span><br />
-                            <span className="highlight">meaningful</span>.
+                            <span className="highlight">meanihandngful</span>.
                         </p>
                     </div>
 
@@ -303,7 +304,11 @@ const About: React.FC = () => {
                     animate={isInView ? "visible" : "hidden"}
                     variants={fadeIn}
                 >
-                    <Canvas shadows gl={{ antialias: true, alpha: true }}>
+                    <Canvas
+                        shadows
+                        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+                        frameloop="demand"
+                    >
                         <Suspense fallback={null}>
                             <ambientLight intensity={0.3} />
 

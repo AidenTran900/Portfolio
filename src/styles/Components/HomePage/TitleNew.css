@@ -12,6 +12,10 @@
     justify-content: center;
     container-type: size;
     z-index: 0;
+    /* GPU layer for parallax performance */
+    will-change: transform;
+    contain: layout style paint;
+    transform: translateZ(0);
 }
 
 .titleBackground {
@@ -21,6 +25,8 @@
     width: 100%;
     height: 100%;
     z-index: 1;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .bgLogo {
@@ -142,6 +148,20 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+}
+
+/* GPU acceleration for parallax elements */
+.titleContent > div {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Ensure all motion elements are on GPU layers */
+.titleBackground,
+.bgLogo {
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 .logoOutlineTop,

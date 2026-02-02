@@ -9,9 +9,21 @@
     justify-content: space-between;
     padding: 0 2rem;
     z-index: 10000;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.85);
+    /* backdrop-filter disabled - causes severe lag with parallax content underneath */
+    /* backdrop-filter: blur(20px); */
+    /* -webkit-backdrop-filter: blur(20px); */
+    /* GPU layer isolation */
+    transform: translateZ(0);
+    contain: layout style;
+}
+
+/* Firefox-only: disable backdrop-filter due to poor performance */
+@-moz-document url-prefix() {
+    .navbar {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: none;
+    }
 }
 
 .navbarLeft,
