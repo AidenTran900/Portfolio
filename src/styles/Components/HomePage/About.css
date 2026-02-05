@@ -94,26 +94,13 @@
     background: transparent;
     border: none;
     color: #ffffff;
-    cursor: pointer;
     font-size: clamp(1rem, 2vw, 1.3rem);
     font-weight: 600;
     text-align: left;
-    transition: all 0.2s ease;
-}
-
-.collapsibleHeader:hover {
-    color: #ff0000;
 }
 
 .collapsibleTitle {
     flex: 1;
-}
-
-.collapsibleIcon {
-    font-size: 1.5rem;
-    font-weight: 300;
-    width: 30px;
-    text-align: center;
 }
 
 .collapsibleContent {

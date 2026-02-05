@@ -10,9 +10,8 @@
     padding: 0 2rem;
     z-index: 10000;
     background: rgba(0, 0, 0, 0.85);
-    /* backdrop-filter disabled - causes severe lag with parallax content underneath */
-    /* backdrop-filter: blur(20px); */
-    /* -webkit-backdrop-filter: blur(20px); */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     /* GPU layer isolation */
     transform: translateZ(0);
     contain: layout style;

@@ -9,28 +9,31 @@ import { useGLTF, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import '@styles/Components/HomePage/About.css';
 
-interface CollapsibleSectionProps {
+interface ExpandableSectionProps {
     title: string;
     children: React.ReactNode;
-    defaultOpen?: boolean;
+    isInView: boolean;
+    delay?: number;
 }
 
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, defaultOpen = false }) => {
-    const [isOpen, setIsOpen] = useState(defaultOpen);
+const ExpandableSection: React.FC<ExpandableSectionProps> = ({ title, children, isInView, delay = 0 }) => {
+    const [hasAnimated, setHasAnimated] = useState(false);
+
+    useEffect(() => {
+        if (isInView && !hasAnimated) {
+            setHasAnimated(true);
+        }
+    }, [isInView, hasAnimated]);
 
     return (
         <div className="collapsibleSection">
-            <button
-                className="collapsibleHeader"
-                onClick={() => setIsOpen(!isOpen)}
-            >
+            <div className="collapsibleHeader">
                 <span className="collapsibleTitle">{title}</span>
-                <span className="collapsibleIcon">{isOpen ? '−' : '+'}</span>
-            </button>
+            </div>
             <motion.div
-                initial={false}
-                animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-                transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: hasAnimated ? 'auto' : 0, opacity: hasAnimated ? 1 : 0 }}
+                transition={{ duration: 0.4, ease: [0.215, 0.61, 0.355, 1], delay: hasAnimated ? 0 : delay }}
                 className="collapsibleContent"
             >
                 <div className="collapsibleInner">
@@ -255,45 +258,46 @@ const About: React.FC = () => {
                             of experience
                         </p>
                         <p className="aboutSubText">
-                            I love building things that challenge me to<br />
-                            <span className="highlight">think differently</span> and <span className="highlight">create something</span><br />
-                            <span className="highlight">meanihandngful</span>.
+                            I am a student at <span className="highlight">UC Berkeley</span> interested in<br />
+                            developing <span className="highlight">software systems</span>, <span className="highlight">machine learning applications</span>,
+                            and <span className="highlight">games</span>.
                         </p>
+
+
                     </div>
 
                     <div className="aboutSkills">
-                        <CollapsibleSection title="Languages:" defaultOpen={false}>
+                        <ExpandableSection title="Languages:" isInView={isInView} delay={0}>
                             <div className="skillGrid">
                                 <div className="skillItem"><SiCplusplus /> C++</div>
                                 <div className="skillItem"><FaPython /> Python</div>
                                 <div className="skillItem"><FaJava /> Java</div>
-                                <div className="skillItem"><SiCplusplus /> C#</div>
                                 <div className="skillItem"><SiLua /> Lua</div>
+                                <div className="skillItem"><SiCplusplus /> C#</div>
                                 <div className="skillItem"><SiTypescript /> TypeScript</div>
                                 <div className="skillItem"><FaHtml5 /> HTML</div>
                                 <div className="skillItem"><FaCss3 /> CSS</div>
                             </div>
-                        </CollapsibleSection>
+                        </ExpandableSection>
 
-                        <CollapsibleSection title="Technologies" defaultOpen={false}>
+                        <ExpandableSection title="Technologies" isInView={isInView} delay={0.1}>
                             <div className="skillGrid">
                                 <div className="skillItem"><FaReact /> React</div>
                                 <div className="skillItem"><FaNodeJs /> Node.js</div>
                                 <div className="skillItem"><SiNextdotjs /> Next.js</div>
                                 <div className="skillItem"><SiElectron /> Electron</div>
                                 <div className="skillItem"><SiUnity /> Unity</div>
-                                <div className="skillItem"><SiRobloxstudio /> Roblox</div>
                                 <div className="skillItem"><SiPostgresql /> PostgreSQL</div>
                             </div>
-                        </CollapsibleSection>
+                        </ExpandableSection>
 
-                        <CollapsibleSection title="Tools" defaultOpen={false}>
+                        <ExpandableSection title="Tools" isInView={isInView} delay={0.2}>
                             <div className="skillGrid">
                                 <div className="skillItem"><FaGit /> Git</div>
                                 <div className="skillItem"><FaDocker /> Docker</div>
                                 <div className="skillItem"><SiFigma /> Figma</div>
                             </div>
-                        </CollapsibleSection>
+                        </ExpandableSection>
                     </div>
                 </motion.div>
 
