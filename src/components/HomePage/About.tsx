@@ -2,7 +2,7 @@ import React, { useRef, Suspense, useEffect, useState } from 'react';
 import {
     FaPython, FaJava, FaReact, FaNodeJs, FaHtml5, FaCss3, FaDocker, FaGit,
 } from 'react-icons/fa';
-import { SiLua, SiRobloxstudio, SiElectron, SiCplusplus, SiNextdotjs, SiUnity, SiTypescript, SiPostgresql, SiFigma } from "react-icons/si";
+import { SiLua, SiElectron, SiCplusplus, SiNextdotjs, SiUnity, SiTypescript, SiPostgresql, SiFigma } from "react-icons/si";
 import { motion, useInView } from 'framer-motion';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { useGLTF, Environment } from '@react-three/drei';
