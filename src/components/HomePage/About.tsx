@@ -1,8 +1,8 @@
 import React, { useRef, Suspense, useEffect, useState } from 'react';
 import {
-    FaPython, FaJava, FaReact, FaNodeJs, FaHtml5, FaCss3, FaDocker, FaGit,
+    FaPython, FaJava, FaReact, FaNodeJs, FaGit,
 } from 'react-icons/fa';
-import { SiLua, SiElectron, SiCplusplus, SiNextdotjs, SiUnity, SiTypescript, SiPostgresql, SiFigma } from "react-icons/si";
+import { SiLua, SiCplusplus, SiNextdotjs, SiUnity, SiTypescript, SiPostgresql } from "react-icons/si";
 import { motion, useInView } from 'framer-motion';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { useGLTF, Environment } from '@react-three/drei';
@@ -275,8 +275,6 @@ const About: React.FC = () => {
                                 <div className="skillItem"><SiLua /> Lua</div>
                                 <div className="skillItem"><SiCplusplus /> C#</div>
                                 <div className="skillItem"><SiTypescript /> TypeScript</div>
-                                <div className="skillItem"><FaHtml5 /> HTML</div>
-                                <div className="skillItem"><FaCss3 /> CSS</div>
                             </div>
                         </ExpandableSection>
 
@@ -285,17 +283,9 @@ const About: React.FC = () => {
                                 <div className="skillItem"><FaReact /> React</div>
                                 <div className="skillItem"><FaNodeJs /> Node.js</div>
                                 <div className="skillItem"><SiNextdotjs /> Next.js</div>
-                                <div className="skillItem"><SiElectron /> Electron</div>
                                 <div className="skillItem"><SiUnity /> Unity</div>
                                 <div className="skillItem"><SiPostgresql /> PostgreSQL</div>
-                            </div>
-                        </ExpandableSection>
-
-                        <ExpandableSection title="Tools" isInView={isInView} delay={0.2}>
-                            <div className="skillGrid">
                                 <div className="skillItem"><FaGit /> Git</div>
-                                <div className="skillItem"><FaDocker /> Docker</div>
-                                <div className="skillItem"><SiFigma /> Figma</div>
                             </div>
                         </ExpandableSection>
                     </div>
